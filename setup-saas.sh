@@ -1,7 +1,9 @@
 #!/bin/bash
-# Enhanced Lean SaaS Template Setup - Complete Separation of Concerns
+# Enhanced Lean SaaS Template Setup - REFACTORED
 # Author: AI Assistant
-# Description: Creates a production-ready SaaS template with Next.js + Supabase
+# Description: Creates a production-ready SaaS template with Next.js + Supabase.
+# This refactored version separates module content from file-writing logic
+# for easier maintenance and safer editing.
 
 set -e
 
@@ -24,54 +26,13 @@ log_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 log_error() { echo -e "${RED}❌ $1${NC}"; }
 log_step() { echo -e "${PURPLE}🚀 $1${NC}"; }
 
-# Check dependencies
-check_dependencies() {
-    log_step "Checking dependencies..."
-    
-    local missing_deps=()
-    
-    if ! command -v node &> /dev/null; then
-        missing_deps+=("Node.js")
-    fi
-    
-    if ! command -v git &> /dev/null; then
-        missing_deps+=("Git")
-    fi
-    
-    if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        log_error "Missing dependencies: ${missing_deps[*]}"
-        log_info "Please install them and try again."
-        exit 1
-    fi
-    
-    log_success "All dependencies satisfied"
-}
+# ==============================================================================
+# HÀM NỘI DUNG MODULES: Nơi an toàn để bạn chỉnh sửa nội dung các script con.
+# Mỗi hàm chỉ chịu trách nhiệm cho nội dung của MỘT file.
+# ==============================================================================
 
-# Create module scripts directory
-setup_modules_directory() {
-    log_step "Setting up modules directory..."
-    
-    mkdir -p setup-modules
-    cd setup-modules
-    
-    # Create module scripts
-    create_project_structure_module
-    create_frontend_setup_module
-    create_supabase_setup_module
-    create_auth_system_module
-    create_ui_components_module
-    create_payment_system_module
-    create_dashboard_setup_module
-    create_email_system_module
-    create_dev_tools_module
-    
-    cd ..
-    log_success "Module scripts created"
-}
-
-# Module 1: Project Structure
-create_project_structure_module() {
-    cat > 01-project-structure.sh << 'MODULE_EOF'
+print_module_01_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 1: Project Structure Setup
 
@@ -100,12 +61,10 @@ setup_project_structure() {
 
 setup_project_structure $1
 MODULE_EOF
-    chmod +x 01-project-structure.sh
 }
 
-# Module 2: Frontend Setup
-create_frontend_setup_module() {
-    cat > 02-frontend-setup.sh << 'MODULE_EOF'
+print_module_02_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 2: Frontend Setup (Next.js + Dependencies) - FIXED
 
@@ -128,7 +87,7 @@ setup_frontend() {
     # Check if directory has files, if so clear it first
     if [ "$(ls -A .)" ]; then
         log_info "Clearing existing frontend files..."
-        rm -rf ./* .*  2>/dev/null || true
+        rm -rf ./* .* 2>/dev/null || true
     fi
     
     # Initialize Next.js project
@@ -173,12 +132,10 @@ setup_frontend() {
 
 setup_frontend
 MODULE_EOF
-    chmod +x 02-frontend-setup.sh
 }
 
-# Module 3: Supabase Setup
-create_supabase_setup_module() {
-    cat > 03-supabase-setup.sh << 'MODULE_EOF'
+print_module_03_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 3: Supabase Setup
 
@@ -522,12 +479,10 @@ DENO
 
 setup_supabase
 MODULE_EOF
-    chmod +x 03-supabase-setup.sh
 }
 
-# Module 4: Auth System
-create_auth_system_module() {
-    cat > 04-auth-system.sh << 'MODULE_EOF'
+print_module_04_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 4: Authentication System Setup
 
@@ -1010,12 +965,10 @@ TS
 
 setup_auth_system
 MODULE_EOF
-    chmod +x 04-auth-system.sh
 }
 
-# Module 5: UI Components
-create_ui_components_module() {
-    cat > 05-ui-components.sh << 'MODULE_EOF'
+print_module_05_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 5: UI Components Setup
 
@@ -1187,8 +1140,6 @@ Label.displayName = 'Label'
 
 export { Label }
 TSX
-
-    # Utils.ts already created at the beginning of this function
 }
 
 create_auth_components() {
@@ -1620,12 +1571,10 @@ TSX
 
 setup_ui_components
 MODULE_EOF
-    chmod +x 05-ui-components.sh
 }
 
-# Module 6: Payment System
-create_payment_system_module() {
-    cat > 06-payment-system.sh << 'MODULE_EOF'
+print_module_06_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 6: Payment System Setup
 
@@ -2101,12 +2050,10 @@ TSX
 
 setup_payment_system
 MODULE_EOF
-    chmod +x 06-payment-system.sh
 }
 
-# Module 7: Dashboard Setup
-create_dashboard_setup_module() {
-    cat > 07-dashboard-setup.sh << 'MODULE_EOF'
+print_module_07_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 7: Dashboard Setup
 
@@ -2549,12 +2496,10 @@ TSX
 
 setup_dashboard
 MODULE_EOF
-    chmod +x 07-dashboard-setup.sh
 }
 
-# Module 8: Email System
-create_email_system_module() {
-    cat > 08-email-system.sh << 'MODULE_EOF'
+print_module_08_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 8: Email System Setup
 
@@ -2923,12 +2868,10 @@ TS
 
 setup_email_system
 MODULE_EOF
-    chmod +x 08-email-system.sh
 }
 
-# Module 9: Dev Tools
-create_dev_tools_module() {
-    cat > 09-dev-tools.sh << 'MODULE_EOF'
+print_module_09_content() {
+cat << 'MODULE_EOF'
 #!/bin/bash
 # Module 9: Development Tools Setup
 
@@ -3300,37 +3243,68 @@ COMPOSE
 
 setup_dev_tools
 MODULE_EOF
-    chmod +x 09-dev-tools.sh
 }
 
-# Main execution function
-main() {
-    log_step "Starting Enhanced Lean SaaS Setup for: $PROJECT_NAME"
+
+# ==============================================================================
+# HÀM ĐIỀU PHỐI: Logic để ghi các module ra file.
+# Bạn hầu như không cần sửa hàm này.
+# ==============================================================================
+
+write_module() {
+    local module_number=$1
+    local module_name=$2
+    local filename="${module_number}-${module_name}.sh"
+
+    log_info "Creating module script: $filename"
+
+    # Dùng case statement để gọi hàm nội dung tương ứng và ghi ra file
+    case $module_number in
+        "01") print_module_01_content > "$filename" ;;
+        "02") print_module_02_content > "$filename" ;;
+        "03") print_module_03_content > "$filename" ;;
+        "04") print_module_04_content > "$filename" ;;
+        "05") print_module_05_content > "$filename" ;;
+        "06") print_module_06_content > "$filename" ;;
+        "07") print_module_07_content > "$filename" ;;
+        "08") print_module_08_content > "$filename" ;;
+        "09") print_module_09_content > "$filename" ;;
+        *)
+            log_error "Unknown module number: $module_number"
+            return 1
+            ;;
+    esac
+
+    # Cấp quyền thực thi cho file vừa tạo
+    chmod +x "$filename"
+}
+
+
+# ==============================================================================
+# LOGIC THỰC THI CHÍNH
+# ==============================================================================
+
+# Check dependencies
+check_dependencies() {
+    log_step "Checking dependencies..."
     
-    check_dependencies
-    setup_modules_directory
+    local missing_deps=()
     
-    # Execute all modules in sequence
-    log_step "Executing setup modules..."
+    if ! command -v node &> /dev/null; then
+        missing_deps+=("Node.js")
+    fi
     
-    ./setup-modules/01-project-structure.sh "$PROJECT_NAME"
-    cd "$PROJECT_NAME"
+    if ! command -v git &> /dev/null; then
+        missing_deps+=("Git")
+    fi
     
-    ../setup-modules/02-frontend-setup.sh
-    ../setup-modules/03-supabase-setup.sh
-    ../setup-modules/04-auth-system.sh
-    ../setup-modules/05-ui-components.sh
-    ../setup-modules/06-payment-system.sh
-    ../setup-modules/07-dashboard-setup.sh
-    ../setup-modules/08-email-system.sh
-    ../setup-modules/09-dev-tools.sh
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        log_error "Missing dependencies: ${missing_deps[*]}"
+        log_info "Please install them and try again."
+        exit 1
+    fi
     
-    create_project_readme
-    create_environment_files
-    create_final_documentation
-    
-    log_success "Enhanced Lean SaaS template setup completed!"
-    show_next_steps
+    log_success "All dependencies satisfied"
 }
 
 # Create project README
@@ -3377,16 +3351,16 @@ A production-ready SaaS template built with Next.js 14, Supabase, and Stripe. Op
 ## 🏗️ Architecture
 
 ```
-├── frontend/           # Next.js 14 app
-│   ├── src/app/       # App router pages
+├── frontend/         # Next.js 14 app
+│   ├── src/app/        # App router pages
 │   ├── src/components/ # Reusable components
-│   ├── src/lib/       # Utilities and config
-│   └── src/hooks/     # Custom React hooks
-├── supabase/          # Database and functions
-│   ├── migrations/    # Database schema
-│   ├── functions/     # Edge functions
-│   └── policies/      # RLS policies
-└── shared/            # Shared types and utils
+│   ├── src/lib/        # Utilities and config
+│   └── src/hooks/      # Custom React hooks
+├── supabase/         # Database and functions
+│   ├── migrations/     # Database schema
+│   ├── functions/      # Edge functions
+│   └── policies/       # RLS policies
+└── shared/           # Shared types and utils
 ```
 
 ## 🚀 Quick Start
@@ -3544,7 +3518,6 @@ Built with amazing open-source tools:
 
 Ready to build your SaaS? 🚀
 README
-
     log_success "Project README created"
 }
 
@@ -3605,30 +3578,30 @@ create_final_documentation() {
 ### Frontend (Next.js 14)
 ```
 frontend/src/
-├── app/                 # App router pages
+├── app/                  # App router pages
 │   ├── (auth)/         # Auth pages group
 │   ├── dashboard/      # Dashboard pages
-│   └── api/           # API routes
-├── components/         # React components
-│   ├── ui/            # Base UI components
-│   ├── auth/          # Auth-specific components
-│   ├── layouts/       # Layout components
-│   └── features/      # Feature-specific components
-├── lib/               # Utilities and configuration
-│   ├── supabase/      # Supabase client setup
-│   ├── stripe/        # Stripe configuration
-│   ├── email/         # Email utilities
-│   └── auth/          # Auth utilities
-└── hooks/             # Custom React hooks
+│   └── api/            # API routes
+├── components/           # React components
+│   ├── ui/             # Base UI components
+│   ├── auth/           # Auth-specific components
+│   ├── layouts/        # Layout components
+│   └── features/       # Feature-specific components
+├── lib/                  # Utilities and configuration
+│   ├── supabase/       # Supabase client setup
+│   ├── stripe/         # Stripe configuration
+│   ├── email/          # Email utilities
+│   └── auth/           # Auth utilities
+└── hooks/                # Custom React hooks
 ```
 
 ### Backend (Supabase)
 ```
 supabase/
-├── migrations/        # Database migrations
-├── functions/         # Edge functions
-├── policies/          # RLS policies
-└── seed/             # Seed data
+├── migrations/         # Database migrations
+├── functions/          # Edge functions
+├── policies/           # RLS policies
+└── seed/               # Seed data
 ```
 
 ## Development Workflow
@@ -3676,8 +3649,8 @@ supabase/
 
 Run tests with:
 ```bash
-pnpm test          # Single run
-pnpm test:watch    # Watch mode
+pnpm test         # Single run
+pnpm test:watch   # Watch mode
 pnpm test:coverage # With coverage
 ```
 
@@ -3808,7 +3781,6 @@ Create monitoring for:
 - Stripe webhook delivery
 - Email delivery rates
 DEPLOY
-
     log_success "Documentation created"
 }
 
@@ -3818,11 +3790,11 @@ show_next_steps() {
     echo "🎉 ${GREEN}Enhanced Lean SaaS Template Setup Complete!${NC}"
     echo ""
     echo "📁 ${BLUE}Project Structure:${NC}"
-    echo "   ├── ${CYAN}frontend/${NC}          Complete Next.js 14 app with TypeScript"
-    echo "   ├── ${CYAN}supabase/${NC}          Database, auth, and edge functions"
-    echo "   ├── ${CYAN}shared/${NC}            Shared types and utilities"
-    echo "   ├── ${CYAN}docs/${NC}              Comprehensive documentation"
-    echo "   └── ${CYAN}setup-modules/${NC}     Individual setup scripts"
+    echo "   ├── ${CYAN}frontend/${NC}        Complete Next.js 14 app with TypeScript"
+    echo "   ├── ${CYAN}supabase/${NC}        Database, auth, and edge functions"
+    echo "   ├── ${CYAN}shared/${NC}          Shared types and utilities"
+    echo "   ├── ${CYAN}docs/${NC}            Comprehensive documentation"
+    echo "   └── ${CYAN}setup-modules/${NC}   Individual setup scripts"
     echo ""
     echo "🚀 ${BLUE}Next Steps:${NC}"
     echo "   ${YELLOW}1.${NC} Configure environment variables:"
@@ -3859,5 +3831,53 @@ show_next_steps() {
     echo ""
 }
 
-# Execute main function
+# Hàm thực thi chính
+main() {
+    log_step "Starting Enhanced Lean SaaS Setup for: $PROJECT_NAME"
+    
+    check_dependencies
+    
+    log_step "Setting up modules directory..."
+    mkdir -p setup-modules
+    cd setup-modules
+
+    # Tạo tất cả các file script con bằng hàm điều phối
+    write_module "01" "project-structure"
+    write_module "02" "frontend-setup"
+    write_module "03" "supabase-setup"
+    write_module "04" "auth-system"
+    write_module "05" "ui-components"
+    write_module "06" "payment-system"
+    write_module "07" "dashboard-setup"
+    write_module "08" "email-system"
+    write_module "09" "dev-tools"
+    
+    cd ..
+    log_success "All module scripts have been created."
+
+    # Thực thi các module theo tuần tự
+    log_step "Executing setup modules..."
+    
+    ./setup-modules/01-project-structure.sh "$PROJECT_NAME"
+    cd "$PROJECT_NAME"
+    
+    ../setup-modules/02-frontend-setup.sh
+    ../setup-modules/03-supabase-setup.sh
+    ../setup-modules/04-auth-system.sh
+    ../setup-modules/05-ui-components.sh
+    ../setup-modules/06-payment-system.sh
+    ../setup-modules/07-dashboard-setup.sh
+    ../setup-modules/08-email-system.sh
+    ../setup-modules/09-dev-tools.sh
+    
+    # Tạo các file cuối cùng và hiển thị hướng dẫn
+    create_project_readme
+    create_environment_files
+    create_final_documentation
+    
+    log_success "Enhanced Lean SaaS template setup completed!"
+    show_next_steps
+}
+
+# Bắt đầu thực thi chương trình
 main

@@ -169,8 +169,6 @@ Label.displayName = 'Label'
 
 export { Label }
 TSX
-
-    # Utils.ts already created at the beginning of this function
 }
 
 create_auth_components() {

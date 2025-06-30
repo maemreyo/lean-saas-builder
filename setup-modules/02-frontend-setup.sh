@@ -20,7 +20,7 @@ setup_frontend() {
     # Check if directory has files, if so clear it first
     if [ "$(ls -A .)" ]; then
         log_info "Clearing existing frontend files..."
-        rm -rf ./* .*  2>/dev/null || true
+        rm -rf ./* .* 2>/dev/null || true
     fi
     
     # Initialize Next.js project
