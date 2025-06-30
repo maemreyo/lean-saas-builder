@@ -1,5 +1,5 @@
 #!/bin/bash
-# modules/features/auth-system.sh - UPDATED: Fixed syntax error with brace expansion
+# modules/features/auth-system.sh
 # Module: Authentication System
 # Version: 2.0.0
 # Description: Sets up authentication with Supabase
@@ -432,7 +432,7 @@ TSX
 create_auth_middleware() {
     log_info "Creating auth middleware..."
     
-    cat > ../../middleware.ts << 'TS'
+    cat > ../middleware.ts << 'TS'
 // middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
