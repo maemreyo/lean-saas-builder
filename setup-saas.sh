@@ -85,13 +85,8 @@ setup_project_structure() {
     mkdir -p "$PROJECT_NAME"
     cd "$PROJECT_NAME"
     
-    # Main directories
-    mkdir -p {frontend,supabase,shared,docs,.vscode,scripts}
-    
-    # Frontend subdirectories
-    mkdir -p frontend/src/{app,components,lib,hooks,utils,types}
-    mkdir -p frontend/src/app/{auth,dashboard,api}
-    mkdir -p frontend/src/components/{ui,forms,layouts,features}
+    # Main directories (don't create frontend subdirectories yet)
+    mkdir -p {supabase,shared,docs,.vscode,scripts}
     
     # Supabase subdirectories
     mkdir -p supabase/{functions,migrations,seed,policies}
@@ -112,7 +107,7 @@ MODULE_EOF
 create_frontend_setup_module() {
     cat > 02-frontend-setup.sh << 'MODULE_EOF'
 #!/bin/bash
-# Module 2: Frontend Setup (Next.js + Dependencies)
+# Module 2: Frontend Setup (Next.js + Dependencies) - FIXED
 
 log_info() { echo -e "\033[0;34mℹ️  $1\033[0m"; }
 log_success() { echo -e "\033[0;32m✅ $1\033[0m"; }
@@ -120,12 +115,20 @@ log_success() { echo -e "\033[0;32m✅ $1\033[0m"; }
 setup_frontend() {
     log_info "Setting up Next.js frontend..."
     
+    # Create frontend directory if it doesn't exist
+    mkdir -p frontend
     cd frontend
     
     # Check if pnpm is installed
     if ! command -v pnpm &> /dev/null; then
         log_info "Installing pnpm..."
         npm install -g pnpm
+    fi
+    
+    # Check if directory has files, if so clear it first
+    if [ "$(ls -A .)" ]; then
+        log_info "Clearing existing frontend files..."
+        rm -rf ./* .*  2>/dev/null || true
     fi
     
     # Initialize Next.js project
@@ -139,12 +142,11 @@ setup_frontend() {
     pnpm add @stripe/stripe-js stripe
     pnpm add resend @react-email/components @react-email/render
     
-    # UI Components
+    # UI Components (only valid Radix UI packages)
     pnpm add @radix-ui/react-dialog @radix-ui/react-dropdown-menu
     pnpm add @radix-ui/react-select @radix-ui/react-toast
     pnpm add @radix-ui/react-accordion @radix-ui/react-tabs
-    pnpm add @radix-ui/react-avatar @radix-ui/react-button
-    pnpm add @radix-ui/react-card @radix-ui/react-table
+    pnpm add @radix-ui/react-avatar
     pnpm add lucide-react
     
     # Utilities
@@ -1023,7 +1025,12 @@ log_success() { echo -e "\033[0;32m✅ $1\033[0m"; }
 setup_ui_components() {
     log_info "Setting up UI components..."
     
-    cd frontend/src/components
+    # Navigate to src directory first
+    cd frontend/src
+    
+    # Create components directory and navigate into it
+    mkdir -p components
+    cd components
     
     # Create component directories
     mkdir -p {ui,auth,layouts,features,forms}
@@ -1039,6 +1046,37 @@ setup_ui_components() {
 
 create_base_ui_components() {
     log_info "Creating base UI components..."
+    
+    # Create utils.ts in lib directory first
+    mkdir -p ../lib
+    cat > ../lib/utils.ts << 'TS'
+// lib/utils.ts
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+export function formatDate(input: string | number | Date): string {
+  const date = new Date(input)
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+export function formatCurrency(
+  amount: number,
+  currency: string = 'USD'
+): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+  }).format(amount)
+}
+TS
     
     # Button component
     cat > ui/Button.tsx << 'TSX'
@@ -1150,35 +1188,7 @@ Label.displayName = 'Label'
 export { Label }
 TSX
 
-    # Create utility functions
-    cat > ../lib/utils.ts << 'TS'
-// lib/utils.ts
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-
-export function formatDate(input: string | number | Date): string {
-  const date = new Date(input)
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
-export function formatCurrency(
-  amount: number,
-  currency: string = 'USD'
-): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(amount)
-}
-TS
+    # Utils.ts already created at the beginning of this function
 }
 
 create_auth_components() {
@@ -1876,6 +1886,9 @@ TS
 
 create_stripe_api_routes() {
     log_info "Creating Stripe API routes..."
+    
+    # Create necessary directories first
+    mkdir -p app/api/stripe/{checkout,portal}
     
     # Checkout API route
     cat > app/api/stripe/checkout/route.ts << 'TS'
@@ -2868,6 +2881,9 @@ TSX
 create_email_api_routes() {
     log_info "Creating email API routes..."
     
+    # Create necessary directories first
+    mkdir -p app/api/send-email
+    
     cat > app/api/send-email/route.ts << 'TS'
 // app/api/send-email/route.ts
 import { createAuthClient } from '@/lib/auth/server'
@@ -2953,10 +2969,10 @@ const createJestConfig = nextJest({
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapping: {
-    '^@/components/(.*): '<rootDir>/src/components/$1',
-    '^@/lib/(.*): '<rootDir>/src/lib/$1',
-    '^@/hooks/(.*): '<rootDir>/src/hooks/$1',
-    '^@/shared/(.*): '<rootDir>/../shared/$1',
+    '^@/components/(.*)$': '<rootDir>/src/components/$1',
+    '^@/lib/(.*)$': '<rootDir>/src/lib/$1',
+    '^@/hooks/(.*)$': '<rootDir>/src/hooks/$1',
+    '^@/shared/(.*)$': '<rootDir>/../shared/$1',
   },
   testEnvironment: 'jest-environment-jsdom',
 }
@@ -2969,6 +2985,8 @@ JS
 import '@testing-library/jest-dom'
 JS
 
+    # Create __tests__ directory first
+    mkdir -p __tests__
     cat > __tests__/example.test.tsx << 'TSX'
 // __tests__/example.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -2988,7 +3006,7 @@ TSX
 {
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build", 
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -3030,6 +3048,10 @@ create_git_hooks() {
 }
 JSON
 
+    # Initialize husky first
+    npx husky init
+    
+    # Create pre-commit hook
     cat > .husky/pre-commit << 'HOOK'
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
