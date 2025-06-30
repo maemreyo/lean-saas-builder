@@ -406,7 +406,7 @@ setup_dev_tools
 
 main() {
     log_step "Starting dev-tools"
-    setup_dev-tools
+    setup_dev_tools
     log_success "dev-tools completed!"
 }
 

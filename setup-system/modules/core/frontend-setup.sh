@@ -1,5 +1,5 @@
 #!/bin/bash
-# modules/core/frontend-setup.sh - UPDATED: Added progress indicators and better UX
+# modules/core/frontend-setup.sh - UPDATED: Fixed non-interactive mode and working directory
 # Module: Frontend Setup
 # Version: 2.0.0
 # Description: Sets up Next.js frontend with dependencies
@@ -31,23 +31,18 @@ show_progress() {
     local command="$2"
     
     log_info "$message..."
-    echo "   Running: $command"
     
     # Run command with progress
     if [[ "${DEBUG:-0}" == "1" ]]; then
-        # In debug mode, show full output
+        # In debug mode, show command being run
+        echo "   Command: $command"
         eval "$command"
     else
         # In normal mode, show minimal progress
-        eval "$command" 2>&1 | while IFS= read -r line; do
-            # Show important lines
-            if [[ "$line" =~ (Installing|Added|Downloading|Progress|✓|✗|Error|Warning) ]]; then
-                echo "   $line"
-            fi
-        done
+        eval "$command" > /dev/null 2>&1
     fi
     
-    local exit_code=${PIPESTATUS[0]}
+    local exit_code=$?
     if [[ $exit_code -eq 0 ]]; then
         log_success "$message completed"
     else
@@ -84,11 +79,11 @@ setup_frontend() {
         log_success "Directory cleared"
     fi
     
-    # Initialize Next.js project
+    # Initialize Next.js project - ALWAYS non-interactive
     log_step "🎯 Creating Next.js application..."
     log_info "This step typically takes 1-2 minutes..."
     show_progress "Creating Next.js app with TypeScript, Tailwind, ESLint" \
-        "pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias '@/*' --skip-install"
+        "pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias '@/*' --yes"
     
     # Add SaaS-specific dependencies in groups
     log_step "📦 Installing SaaS dependencies..."
@@ -131,12 +126,6 @@ setup_frontend() {
     log_info "Installing development dependencies..."
     show_progress "Adding TypeScript and Prettier" \
         "pnpm add -D @types/node prettier prettier-plugin-tailwindcss @types/react @types/react-dom tailwindcss-animate"
-    
-    # Final install
-    log_step "🔄 Running final dependency installation..."
-    log_info "This step typically takes 1-3 minutes..."
-    show_progress "Installing all dependencies" \
-        "pnpm install"
     
     cd ..
     log_success "Frontend setup completed successfully! 🎉"

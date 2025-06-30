@@ -477,7 +477,7 @@ setup_dashboard
 
 main() {
     log_step "Starting dashboard-setup"
-    setup_dashboard-setup
+    setup_dashboard
     log_success "dashboard-setup completed!"
 }
 

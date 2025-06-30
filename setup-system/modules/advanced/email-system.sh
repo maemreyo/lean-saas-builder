@@ -403,7 +403,7 @@ setup_email_system
 
 main() {
     log_step "Starting email-system"
-    setup_email-system
+    setup_email_system
     log_success "email-system completed!"
 }
 

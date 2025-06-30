@@ -1,5 +1,5 @@
 #!/bin/bash
-# modules/core/supabase-setup.sh
+# modules/core/supabase-setup.sh - UPDATED: Fixed working directory handling
 # Module: Supabase Setup
 # Version: 2.0.0
 # Description: Configures Supabase database and auth
@@ -28,13 +28,6 @@ fi
 # ==============================================================================
 # MODULE FUNCTIONS
 # ==============================================================================
-
-#!/bin/bash
-# Module 3: Supabase Setup
-
-log_info() { echo -e "\033[0;34mℹ️  $1\033[0m"; }
-log_success() { echo -e "\033[0;32m✅ $1\033[0m"; }
-log_warning() { echo -e "\033[1;33m⚠️  $1\033[0m"; }
 
 detect_os() {
     case "$(uname -s)" in
@@ -84,6 +77,14 @@ setup_supabase() {
     log_info "Setting up Supabase..."
     
     install_supabase_cli
+    
+    # Check if supabase directory exists
+    if [[ ! -d "supabase" ]]; then
+        log_error "Supabase directory not found. Expected to be in project root."
+        log_info "Current directory: $(pwd)"
+        log_info "Directory contents: $(ls -la)"
+        return 1
+    fi
     
     cd supabase
     
@@ -370,15 +371,13 @@ async function handleSubscriptionDeleted(supabase: any, subscription: any) {
 DENO
 }
 
-setup_supabase
-
 # ==============================================================================
 # MAIN EXECUTION
 # ==============================================================================
 
 main() {
     log_step "Starting supabase-setup"
-    setup_supabase-setup
+    setup_supabase
     log_success "supabase-setup completed!"
 }
 

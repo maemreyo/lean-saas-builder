@@ -1,5 +1,5 @@
 #!/bin/bash
-# saas-setup.sh - Modern SaaS Template Orchestrator - UPDATED: Fixed array handling and module execution
+# saas-setup.sh - Modern SaaS Template Orchestrator - UPDATED: Fixed working directory handling
 # A lightweight, extensible setup system for SaaS applications
 
 set -e
@@ -115,20 +115,47 @@ execute_modules() {
     log_step "Executing modules in sequence..."
     
     local executed_count=0
+    local original_dir=$(pwd)
     
     for module_file in "${DISCOVERED_MODULES[@]}"; do
         local module_name=$(get_module_name "$module_file")
         
         log_info "Executing module: $module_name"
         
-        if run_module "$module_file" "$PROJECT_NAME"; then
-            log_success "Module completed: $module_name"
-            ((executed_count++))
+        # Special handling for project-structure module
+        if [[ "$module_name" == "project-structure" ]]; then
+            # Run project-structure from original directory
+            cd "$original_dir"
+            if run_module "$module_file" "$PROJECT_NAME"; then
+                log_success "Module completed: $module_name"
+                ((executed_count++))
+                
+                # After project-structure, change to project directory
+                if [[ -d "$PROJECT_NAME" ]]; then
+                    cd "$PROJECT_NAME"
+                    log_info "Changed working directory to: $(pwd)"
+                else
+                    log_error "Project directory not created: $PROJECT_NAME"
+                    exit 1
+                fi
+            else
+                log_error "Module failed: $module_name"
+                exit 1
+            fi
         else
-            log_error "Module failed: $module_name"
-            exit 1
+            # Run other modules from project directory
+            if run_module "$module_file" "$PROJECT_NAME"; then
+                log_success "Module completed: $module_name"
+                ((executed_count++))
+            else
+                log_error "Module failed: $module_name"
+                exit 1
+            fi
         fi
     done
+    
+    # Return to original directory
+    cd "$original_dir"
     
     if [[ $executed_count -gt 0 ]]; then
         log_success "All $executed_count modules executed successfully"

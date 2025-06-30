@@ -510,7 +510,7 @@ setup_payment_system
 
 main() {
     log_step "Starting payment-system"
-    setup_payment-system
+    setup_payment_system
     log_success "payment-system completed!"
 }
 
