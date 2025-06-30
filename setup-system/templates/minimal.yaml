@@ -1,0 +1,27 @@
+name: minimal
+description: "Minimal SaaS template for quick prototyping"
+version: "2.0.0"
+author: "SaaS Template Team"
+
+modules:
+  - project-structure
+  - frontend-setup
+  - auth-system
+  - ui-components
+
+features:
+  - "Next.js 14 with TypeScript"
+  - "Basic authentication"
+  - "Simple UI components"
+  - "Minimal setup for rapid prototyping"
+
+options:
+  typescript: true
+  tailwind: true
+  package_manager: "pnpm"
+  node_version: ">=18"
+
+environment:
+  required_vars:
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY

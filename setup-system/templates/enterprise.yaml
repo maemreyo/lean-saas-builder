@@ -1,0 +1,47 @@
+name: enterprise
+description: "Enterprise-grade SaaS template with advanced features"
+version: "2.0.0"
+author: "SaaS Template Team"
+
+modules:
+  - project-structure
+  - frontend-setup
+  - supabase-setup
+  - auth-system
+  - ui-components
+  - payment-system
+  - dashboard-setup
+  - email-system
+  - dev-tools
+  - monitoring
+  - security
+  - multi-tenant
+
+features:
+  - "Everything in full-saas"
+  - "Multi-tenant architecture"
+  - "Advanced security features"
+  - "Monitoring & analytics"
+  - "Performance optimization"
+  - "Enterprise authentication (SAML, LDAP)"
+
+options:
+  typescript: true
+  tailwind: true
+  package_manager: "pnpm"
+  node_version: ">=18"
+  testing: true
+  docker: true
+  ci_cd: true
+  monitoring: true
+  multi_tenant: true
+
+environment:
+  required_vars:
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - STRIPE_SECRET_KEY
+    - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    - RESEND_API_KEY
+    - SENTRY_DSN
+    - ANALYTICS_KEY

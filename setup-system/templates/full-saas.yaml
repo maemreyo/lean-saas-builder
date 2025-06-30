@@ -1,0 +1,40 @@
+name: full-saas
+description: "Complete SaaS template with all advanced features"
+version: "2.0.0"
+author: "SaaS Template Team"
+
+modules:
+  - project-structure
+  - frontend-setup
+  - supabase-setup
+  - auth-system
+  - ui-components
+  - payment-system
+  - dashboard-setup
+  - email-system
+  - dev-tools
+
+features:
+  - "Everything in lean-saas"
+  - "Email system with Resend"
+  - "Advanced development tools"
+  - "Testing setup with Jest"
+  - "CI/CD with GitHub Actions"
+  - "Docker support"
+
+options:
+  typescript: true
+  tailwind: true
+  package_manager: "pnpm"
+  node_version: ">=18"
+  testing: true
+  docker: true
+  ci_cd: true
+
+environment:
+  required_vars:
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - STRIPE_SECRET_KEY
+    - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    - RESEND_API_KEY

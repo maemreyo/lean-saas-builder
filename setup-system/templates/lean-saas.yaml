@@ -1,0 +1,33 @@
+name: lean-saas
+description: "Lightweight SaaS template with essential features"
+version: "2.0.0"
+author: "SaaS Template Team"
+
+modules:
+  - project-structure
+  - frontend-setup
+  - supabase-setup
+  - auth-system
+  - ui-components
+  - payment-system
+  - dashboard-setup
+
+features:
+  - "Next.js 14 with TypeScript"
+  - "Supabase authentication & database"
+  - "Stripe payment integration"
+  - "Basic dashboard & UI components"
+  - "Tailwind CSS styling"
+
+options:
+  typescript: true
+  tailwind: true
+  package_manager: "pnpm"
+  node_version: ">=18"
+
+environment:
+  required_vars:
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - STRIPE_SECRET_KEY
+    - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
