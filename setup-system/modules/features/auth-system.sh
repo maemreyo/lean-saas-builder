@@ -1,5 +1,5 @@
 #!/bin/bash
-# modules/features/auth-system.sh
+# modules/features/auth-system.sh - UPDATED: Fixed syntax error with brace expansion
 # Module: Authentication System
 # Version: 2.0.0
 # Description: Sets up authentication with Supabase
@@ -29,19 +29,13 @@ fi
 # MODULE FUNCTIONS
 # ==============================================================================
 
-#!/bin/bash
-# Module 4: Authentication System Setup
-
-log_info() { echo -e "\033[0;34mℹ️  $1\033[0m"; }
-log_success() { echo -e "\033[0;32m✅ $1\033[0m"; }
-
 setup_auth_system() {
     log_info "Setting up authentication system..."
     
     cd frontend/src
     
-    # Create auth-related directories
-    mkdir -p app/auth/{login,register,forgot-password,callback}
+    # Create auth-related directories - Fixed brace expansion
+    mkdir -p app/auth/login app/auth/register app/auth/forgot-password app/auth/callback
     mkdir -p lib/auth
     mkdir -p hooks/auth
     
@@ -509,15 +503,13 @@ export const config = {
 TS
 }
 
-setup_auth_system
-
 # ==============================================================================
 # MAIN EXECUTION
 # ==============================================================================
 
 main() {
     log_step "Starting auth-system"
-    setup_auth-system
+    setup_auth_system
     log_success "auth-system completed!"
 }
 

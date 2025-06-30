@@ -1,3 +1,4 @@
+# setup-system/lib/helpers.sh - UPDATED: Fixed YAML parsing and array handling
 # Helper utilities
 
 get_module_name() {
@@ -50,8 +51,12 @@ parse_yaml_array() {
     if command -v yq &>/dev/null; then
         yq eval ".${key}[]" "$yaml_file" 2>/dev/null || echo ""
     else
-        # Fallback: simple grep-based parsing
-        grep -A 20 "$key:" "$yaml_file" | grep "^  -" | sed 's/^  - //' | tr '\n' ' '
+        # Improved fallback: parse only the specific section
+        awk "
+        /^${key}:/ { in_section=1; next }
+        in_section && /^[a-zA-Z]/ && !/^  / { in_section=0 }
+        in_section && /^  - / { gsub(/^  - /, \"\"); print }
+        " "$yaml_file"
     fi
 }
 

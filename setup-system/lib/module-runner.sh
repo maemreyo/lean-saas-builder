@@ -1,3 +1,4 @@
+# setup-system/lib/module-runner.sh
 # Module execution utilities
 
 run_module() {
@@ -14,22 +15,33 @@ run_module() {
     export TEMPLATE_CONFIG
     export DEBUG
     
+    # Show module start
+    local module_name=$(get_module_name "$module_file")
+    echo ""
+    log_step "🔧 Executing: $module_name"
+    
     # Execute module and capture output
     if [[ "${DEBUG:-0}" == "1" ]]; then
+        # In debug mode, show full output
+        log_debug "Debug mode: showing full output"
         "$module_file" "$project_name"
     else
+        # In normal mode, let module handle its own progress
         "$module_file" "$project_name" 2>&1 | while IFS= read -r line; do
-            log_debug "[$module_file] $line"
+            # Pass through log lines but suppress some noise
+            if [[ ! "$line" =~ ^(npm\ WARN|npm\ notice) ]]; then
+                echo "$line"
+            fi
         done
     fi
     
     local exit_code=${PIPESTATUS[0]}
     
     if [[ $exit_code -eq 0 ]]; then
-        log_debug "Module completed successfully: $module_file"
+        log_success "✅ Module completed: $module_name"
         return 0
     else
-        log_error "Module failed with exit code $exit_code: $module_file"
+        log_error "❌ Module failed: $module_name (exit code: $exit_code)"
         return $exit_code
     fi
 }

@@ -1,5 +1,4 @@
-
-# Validation utilities
+# lib/validator.sh - Validation utilities
 
 validate_directory() {
     local dir=$1

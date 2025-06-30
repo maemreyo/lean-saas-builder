@@ -1,5 +1,5 @@
 #!/bin/bash
-# saas-setup.sh - Modern SaaS Template Orchestrator
+# saas-setup.sh - Modern SaaS Template Orchestrator - UPDATED: Fixed array handling and module execution
 # A lightweight, extensible setup system for SaaS applications
 
 set -e
@@ -16,6 +16,9 @@ CONFIG_DIR="$SCRIPT_DIR/config"
 
 PROJECT_NAME=${1:-"lean-saas-app"}
 TEMPLATE=${2:-"lean-saas"}
+
+# Global array for discovered modules
+declare -a DISCOVERED_MODULES
 
 # Source shared utilities
 source "$LIB_DIR/logger.sh"
@@ -70,7 +73,7 @@ list_available_templates() {
     for template in "$TEMPLATES_DIR"/*.yaml; do
         if [[ -f "$template" ]]; then
             local name=$(basename "$template" .yaml)
-            local description=$(grep "^description:" "$template" | cut -d'"' -f2)
+            local description=$(get_yaml_value "$template" "description")
             log_info "  - $name: $description"
         fi
     done
@@ -79,23 +82,23 @@ list_available_templates() {
 discover_modules() {
     log_step "Discovering available modules..."
     
-    local modules=()
+    # Clear the array
+    DISCOVERED_MODULES=()
     
     # Get modules from template config
-    local template_modules=$(parse_yaml_array "$TEMPLATE_CONFIG" "modules")
-    
-    for module in $template_modules; do
-        local module_file=$(find_module_file "$module")
-        if [[ -n "$module_file" ]]; then
-            modules+=("$module_file")
-            log_info "Found module: $module ($module_file)"
-        else
-            log_warning "Module not found: $module"
+    while IFS= read -r module; do
+        if [[ -n "$module" ]]; then
+            local module_file=$(find_module_file "$module")
+            if [[ -n "$module_file" ]]; then
+                DISCOVERED_MODULES+=("$module_file")
+                log_info "Found module: $module ($module_file)"
+            else
+                log_warning "Module not found: $module"
+            fi
         fi
-    done
+    done < <(parse_yaml_array "$TEMPLATE_CONFIG" "modules")
     
-    export DISCOVERED_MODULES=("${modules[@]}")
-    log_success "Discovered ${#modules[@]} modules"
+    log_success "Discovered ${#DISCOVERED_MODULES[@]} modules"
 }
 
 validate_module_dependencies() {
@@ -111,6 +114,8 @@ validate_module_dependencies() {
 execute_modules() {
     log_step "Executing modules in sequence..."
     
+    local executed_count=0
+    
     for module_file in "${DISCOVERED_MODULES[@]}"; do
         local module_name=$(get_module_name "$module_file")
         
@@ -118,13 +123,18 @@ execute_modules() {
         
         if run_module "$module_file" "$PROJECT_NAME"; then
             log_success "Module completed: $module_name"
+            ((executed_count++))
         else
             log_error "Module failed: $module_name"
             exit 1
         fi
     done
     
-    log_success "All modules executed successfully"
+    if [[ $executed_count -gt 0 ]]; then
+        log_success "All $executed_count modules executed successfully"
+    else
+        log_warning "No modules were executed"
+    fi
 }
 
 show_completion_summary() {

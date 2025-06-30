@@ -1,5 +1,5 @@
 #!/bin/bash
-# modules/features/ui-components.sh
+# modules/features/ui-components.sh - UPDATED: Fixed syntax error with brace expansion
 # Module: UI Components
 # Version: 2.0.0
 # Description: Creates base UI component library
@@ -29,12 +29,6 @@ fi
 # MODULE FUNCTIONS
 # ==============================================================================
 
-#!/bin/bash
-# Module 5: UI Components Setup
-
-log_info() { echo -e "\033[0;34mℹ️  $1\033[0m"; }
-log_success() { echo -e "\033[0;32m✅ $1\033[0m"; }
-
 setup_ui_components() {
     log_info "Setting up UI components..."
     
@@ -45,8 +39,8 @@ setup_ui_components() {
     mkdir -p components
     cd components
     
-    # Create component directories
-    mkdir -p {ui,auth,layouts,features,forms}
+    # Create component directories - Fixed brace expansion
+    mkdir -p ui auth layouts features forms
     
     create_base_ui_components
     create_auth_components
@@ -61,7 +55,7 @@ create_base_ui_components() {
     log_info "Creating base UI components..."
     
     # Create utils.ts in lib directory first
-    mkdir -p ../lib
+    mkdir -p ../lib/supabase
     cat > ../lib/utils.ts << 'TS'
 // lib/utils.ts
 import { type ClassValue, clsx } from 'clsx'
@@ -89,6 +83,18 @@ export function formatCurrency(
     currency,
   }).format(amount)
 }
+TS
+    
+    # Create Supabase client
+    cat > ../lib/supabase/client.ts << 'TS'
+// lib/supabase/client.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export const createClient = () =>
+  createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 TS
     
     # Button component
@@ -629,15 +635,13 @@ export function ContactForm() {
 TSX
 }
 
-setup_ui_components
-
 # ==============================================================================
 # MAIN EXECUTION
 # ==============================================================================
 
 main() {
     log_step "Starting ui-components"
-    setup_ui-components
+    setup_ui_components
     log_success "ui-components completed!"
 }
 

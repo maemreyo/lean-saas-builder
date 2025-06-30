@@ -1,4 +1,4 @@
-# Logging utilities
+# lib/logger.sh - Logging utilities
 
 # Colors for output
 RED='\033[0;31m'
